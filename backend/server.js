@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require('path');
 
 const User = require('./models/User');
 const PointHistory = require('./models/PointHistory');
@@ -12,6 +13,11 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static files from React build in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/dist')));
+}
 
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
@@ -99,6 +105,13 @@ app.get('/api/users/:userId/history', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+// Serve React app for all non-API routes in production
+if (process.env.NODE_ENV === 'production') {
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+    });
+}
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

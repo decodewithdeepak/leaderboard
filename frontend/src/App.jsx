@@ -39,7 +39,10 @@ import {
   Leaderboard as LeaderboardIcon
 } from '@mui/icons-material'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+// API configuration for different environments
+const API_BASE_URL = import.meta.env.PROD 
+  ? '/api'  // Production: same domain
+  : 'http://localhost:5000/api'  // Development: backend server
 
 function App() {
   const [users, setUsers] = useState([])
